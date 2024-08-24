@@ -80,17 +80,12 @@ function calculate() {
         
         // Manejar el resultado
         if (result === undefined) {
-            // Verifica si es una variable sin valor asignado
-            const undefinedVars = variables.filter(v => typeof window[v] === 'undefined');
-            if (undefinedVars.length > 0) {
-                result = undefinedVars.join(", "); // Muestra las variables no definidas
-            } else {
-                result = 'Error'; // Error general
-            }
-        } else if (typeof result === 'boolean') {
-            result = result ? 'Verdadero' : 'Falso';
+            // No se puede evaluar si hay variables sin valor
+            result = variables.join(", "); // Mostrar variables no definidas
         } else if (result === 0 || result === 1) {
             result = result.toString(); // Convertir 0 o 1 a cadena
+        } else {
+            result = result ? 'Verdadero' : 'Falso'; // Para booleanos
         }
 
         document.getElementById("booleanResult").textContent = result;
