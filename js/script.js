@@ -67,13 +67,15 @@ function calculate() {
     let simplifiedExpr = simplifyExpression(booleanExpr);
     steps.push(`Expresión simplificada: ${simplifiedExpr}`);
     
+    // Definir variables a partir de la expresión
+    const variables = [...new Set(simplifiedExpr.match(/\b\w+\b/g))].reduce((acc, variable) => {
+        acc[variable] = true; // Puedes cambiarlo a false según necesites
+        return acc;
+    }, {});
     // Paso 3: Evaluar la expresión simplificada
     try {
-        // Definir las variables permitidas
-        const vars = { A: true, B: false, C: true, D: false }; // Valores de ejemplo, se pueden cambiar
-
         // Evaluar la expresión en el contexto de las variables definidas
-        let result = new Function("with(this) { return " + simplifiedExpr + "; }").call(vars);
+        let result = new Function("with(this) { return " + simplifiedExpr + "; }").call(variables);
         document.getElementById("booleanResult").textContent = result ? 'Verdadero' : 'Falso';
         steps.push(`Evaluación: ${result ? 'Verdadero' : 'Falso'}`);
     } catch (error) {
