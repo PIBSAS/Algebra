@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Álgebra de Boole</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Calculadora de Álgebra de Boole</h1>
+        <form id="booleanForm">
+            <label for="expression">Ingrese su expresión booleana:</label>
+            <input type="text" id="expression" name="expression" placeholder="Ej: A AND B OR NOT C">
+            <button type="button" onclick="calculate()">Calcular</button>
+        </form>
+        <div id="result">
+            <h2>Resultado:</h2>
+            <p id="booleanResult"></p>
+            <h2>Pasos:</h2>
+            <ul id="steps"></ul>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
