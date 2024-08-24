@@ -76,16 +76,16 @@ function calculate() {
         const variables = [...new Set(simplifiedExpr.match(/\b\w+\b/g))];
 
         // Evaluar la expresión en el contexto de las variables definidas
-        let result = new Function(...variables, `return (${simplifiedExpr});`)(...variables.map(v => undefined)); // Sin valores asignados
+        let result = new Function(...variables, `return (${simplifiedExpr.replace(/\b0\b/g, 'false').replace(/\b1\b/g, 'true')});`)(...variables.map(() => undefined)); // Sin valores asignados
         
         // Manejar el resultado
         if (result === undefined) {
             // No se puede evaluar si hay variables sin valor
             result = variables.join(", "); // Mostrar variables no definidas
-        } else if (result === 0 || result === 1) {
-            result = result.toString(); // Convertir 0 o 1 a cadena
+        } else if (result === true || result === false) {
+            result = result ? '1' : '0'; // Para booleanos
         } else {
-            result = result ? 'Verdadero' : 'Falso'; // Para booleanos
+            result = result.toString(); // Convertir a cadena
         }
 
         document.getElementById("booleanResult").textContent = result;
