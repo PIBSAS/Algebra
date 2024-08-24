@@ -72,25 +72,26 @@ function calculate() {
     let simplifiedExpr = simplifyExpression(booleanExpr);
     steps.push(`Expresión simplificada: ${simplifiedExpr}`);
     
-    // Paso 3: Evaluar la expresión simplificada
+    // Paso 3: Evaluar la expresión simplificada para A=0 y A=1
     try {
-        // Definir las variables encontradas
         const variables = [...new Set(simplifiedExpr.match(/\b\w+\b/g))];
+        let results = {};
 
-        // Evaluar la expresión en el contexto de las variables definidas
-        let result = new Function(...variables, `return (${simplifiedExpr.replace(/\b0\b/g, 'false').replace(/\b1\b/g, 'true')});`)(...variables.map(() => undefined)); // Sin valores asignados    
-        // Manejar el resultado
-        if (result === undefined) {
-            // No se puede evaluar si hay variables sin valor
-            result = variables.length === 0 ? 'Error en la expresión' : '0'; // Mostrar variables no definidas
-        } else if (result === true || result === false) {
-            result = result ? '1' : '0'; // Para booleanos
-        } else {
-            result = result.toString(); // Convertir a cadena
+        // Evaluar para cada combinación de valores posibles
+        const combinations = 2 ** variables.length;
+        for (let i = 0; i < combinations; i++) {
+            const values = [];
+            for (let j = 0; j < variables.length; j++) {
+                values[j] = (i >> j) & 1; // 0 o 1
+            }
+            let result = new Function(...variables, `return (${simplifiedExpr.replace(/\b0\b/g, 'false').replace(/\b1\b/g, 'true')});`)(...values);
+            results[values.join(',')] = result ? '1' : '0'; // Almacenar el resultado
         }
 
-        document.getElementById("booleanResult").textContent = result;
-        steps.push(`Evaluación: ${result}`);
+        // Mostrar resultados
+        Object.entries(results).forEach(([key, value]) => {
+            steps.push(`Para A=${key.split(',').join(', A=')}: Resultado=${value}`);
+        });
     } catch (error) {
         document.getElementById("booleanResult").textContent = 'Error en la expresión';
         steps.push(`Error al evaluar la expresión`);
