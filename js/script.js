@@ -21,36 +21,28 @@ function simplifyExpression(expression) {
     // Postulado de Complemento
     simplifiedExpr = simplifiedExpr
         .replace(/\b(\w+)\s*\+\s*!\1\b/g, '1') // A + !A = 1
-        .replace(/\b!\w+\s*\+\s*\w+\b/g, '1') // !A + A = 1
-        .replace(/\b(\w+)\s*\*\s*!\1\b/g, '0') // A * !A = 0
-        .replace(/\b!\w+\s*\*\s*\w+\b/g, '0'); // !A * A = 0
+        .replace(/\b(\w+)\s*\*\s*!\1\b/g, '0'); // A * !A = 0
 
     // Postulado de Involución
     simplifiedExpr = simplifiedExpr
         .replace(/!\(!(\w+)\)/g, '$1') // !!A = A
         .replace(/!\(!\(!(\w+)\)\)/g, '!$1'); // !!!A = !A
 
-    // Propiedad Conmutativa
-    // A + B = B + A y A * B = B * A no se necesitan cambios específicos en la evaluación, 
-    // pero se debe permitir la reordenación si se quiere.
-    // Aquí, simplificamos ejemplos sencillos:
+    // Propiedad Conmutativa (se mantiene la estructura para que funcione con variables)
     simplifiedExpr = simplifiedExpr
-        .replace(/\b(\w+)\s*\+\s*(\w+)\b/g, '$2 + $1') // A + B = B + A
-        .replace(/\b(\w+)\s*\*\s*(\w+)\b/g, '$2 * $1'); // A * B = B * A
+        .replace(/\b(\w+)\s*\+\s*(\w+)\b/g, '$1 + $2') // A + B = A + B (ejemplo simple, sin reordenar)
+        .replace(/\b(\w+)\s*\*\s*(\w+)\b/g, '$1 * $2'); // A * B = A * B (ejemplo simple, sin reordenar)
 
     // Propiedad Asociativa
-    // (A + B) + C = A + (B + C) y (A * B) * C = A * (B * C)
     simplifiedExpr = simplifiedExpr
         .replace(/\((\w+)\s*\+\s*(\w+)\)\s*\+\s*(\w+)/g, '$1 + ($2 + $3)') // (A + B) + C = A + (B + C)
         .replace(/\((\w+)\s*\*\s*(\w+)\)\s*\*\s*(\w+)/g, '$1 * ($2 * $3)'); // (A * B) * C = A * (B * C)
 
     // Propiedad Distributiva
-    // A * (B + C) = (A * B) + (A * C)
     simplifiedExpr = simplifiedExpr
         .replace(/\b(\w+)\s*\*\s*\((\w+)\s*\+\s*(\w+)\)/g, '($1 * $2) + ($1 * $3)'); // A * (B + C) = (A * B) + (A * C)
 
     // Teoremas de De Morgan
-    // !(A + B) = !A * !B y !(A * B) = !A + !B
     simplifiedExpr = simplifiedExpr
         .replace(/!\((\w+)\s*\+\s*(\w+)\)/g, '!$1 * !$2') // !(A + B) = !A * !B
         .replace(/!\((\w+)\s*\*\s*(\w+)\)/g, '!$1 + !$2'); // !(A * B) = !A + !B
@@ -59,17 +51,17 @@ function simplifyExpression(expression) {
 }
 
 function calculate() {
-    let expression = document.getElementById("expression").value.trim();
+    const expression = document.getElementById("expression").value.trim();
     const steps = [];
-    
-    // Reemplazar operadores por sus equivalentes en JavaScript
-    let booleanExpr = expression
-        .replace(/AND/g, '&&')
-        .replace(/OR/g, '||')
-        .replace(/NOT/g, '!');
     
     // Paso 1: Mostrar la expresión original
     steps.push(`Expresión original: ${expression}`);
+    
+    // Reemplazar operadores por sus equivalentes en JavaScript
+    let booleanExpr = expression
+        .replace(/\bAND\b/g, '&&')
+        .replace(/\bOR\b/g, '||')
+        .replace(/\bNOT\b/g, '!');
     
     // Paso 2: Simplificar la expresión usando los postulados del Álgebra de Boole
     let simplifiedExpr = simplifyExpression(booleanExpr);
@@ -77,7 +69,11 @@ function calculate() {
     
     // Paso 3: Evaluar la expresión simplificada
     try {
-        let result = eval(simplifiedExpr);
+        // Definir las variables permitidas
+        const vars = { A: true, B: false, C: true, D: false }; // Valores de ejemplo, se pueden cambiar
+
+        // Evaluar la expresión en el contexto de las variables definidas
+        let result = new Function("with(this) { return " + simplifiedExpr + "; }").call(vars);
         document.getElementById("booleanResult").textContent = result ? 'Verdadero' : 'Falso';
         steps.push(`Evaluación: ${result ? 'Verdadero' : 'Falso'}`);
     } catch (error) {
