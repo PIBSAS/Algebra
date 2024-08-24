@@ -65,7 +65,8 @@ function calculate() {
         .replace(/\bor\b/g, '||')
         .replace(/\bNOT\b/g, '!')
         .replace(/\bnot\b/g, '!')
-        .replace(/\s+\g, ' ');
+        .replace(/\s+/g, ' '); // Asegúrate de limpiar espacios extra
+
     
     // Paso 2: Simplificar la expresión usando los postulados del Álgebra de Boole
     let simplifiedExpr = simplifyExpression(booleanExpr);
