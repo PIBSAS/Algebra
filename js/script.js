@@ -1,5 +1,16 @@
+function simplifyExpression(expression) {
+    // Simplificación de Identidad A + 0 = A y A * 1 = A
+    let simplifiedExpr = expression
+        .replace(/\b(\w+)\s*\+\s*0\b/g, '$1') // A + 0 = A
+        .replace(/\b0\s*\+\s*(\w+)\b/g, '$1') // 0 + A = A
+        .replace(/\b(\w+)\s*\*\s*1\b/g, '$1') // A * 1 = A
+        .replace(/\b1\s*\*\s*(\w+)\b/g, '$1'); // 1 * A = A
+
+    return simplifiedExpr;
+}
+
 function calculate() {
-    const expression = document.getElementById("expression").value.trim();
+    let expression = document.getElementById("expression").value.trim();
     const steps = [];
     
     // Reemplazar operadores por sus equivalentes en JavaScript
@@ -11,27 +22,13 @@ function calculate() {
     // Paso 1: Mostrar la expresión original
     steps.push(`Expresión original: ${expression}`);
     
-    // Paso 2: Convertir la expresión a formato JavaScript
-    steps.push(`Convertir a expresión evaluable: ${booleanExpr}`);
+    // Paso 2: Simplificar la expresión
+    let simplifiedExpr = simplifyExpression(booleanExpr);
+    steps.push(`Expresión simplificada: ${simplifiedExpr}`);
     
-    // Paso 3: Definir los valores de las variables
-    const variables = {
-        A: true,  // Puedes cambiar estos valores a true o false según lo que necesites
-        B: false,
-        C: true,
-        D: false  // Se agrega la variable D
-    };
-
-    // Reemplazar variables en la expresión con sus valores
-    for (let [key, value] of Object.entries(variables)) {
-        let regExp = new RegExp(`\\b${key}\\b`, 'g'); // Solo reemplazar variables completas
-        booleanExpr = booleanExpr.replace(regExp, value);
-        steps.push(`Reemplazar ${key} con ${value ? 'Verdadero' : 'Falso'}`);
-    }
-    
-    // Paso 4: Evaluar la expresión
+    // Paso 3: Evaluar la expresión simplificada
     try {
-        let result = eval(booleanExpr);
+        let result = eval(simplifiedExpr);
         document.getElementById("booleanResult").textContent = result ? 'Verdadero' : 'Falso';
         steps.push(`Evaluación: ${result ? 'Verdadero' : 'Falso'}`);
     } catch (error) {
