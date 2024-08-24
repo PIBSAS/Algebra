@@ -11,10 +11,25 @@ function calculate() {
     // Paso 1: Mostrar la expresión original
     steps.push(`Expresión original: ${expression}`);
     
-    // Paso 2: Mostrar la expresión convertida a formato JavaScript
+    // Paso 2: Convertir la expresión a formato JavaScript
     steps.push(`Convertir a expresión evaluable: ${booleanExpr}`);
     
-    // Paso 3: Evaluar la expresión
+    // Paso 3: Definir los valores de las variables
+    const variables = {
+        A: true,  // Puedes cambiar estos valores a true o false según lo que necesites
+        B: false,
+        C: true,
+        D: false  // Se agrega la variable D
+    };
+
+    // Reemplazar variables en la expresión con sus valores
+    for (let [key, value] of Object.entries(variables)) {
+        let regExp = new RegExp(`\\b${key}\\b`, 'g'); // Solo reemplazar variables completas
+        booleanExpr = booleanExpr.replace(regExp, value);
+        steps.push(`Reemplazar ${key} con ${value ? 'Verdadero' : 'Falso'}`);
+    }
+    
+    // Paso 4: Evaluar la expresión
     try {
         let result = eval(booleanExpr);
         document.getElementById("booleanResult").textContent = result ? 'Verdadero' : 'Falso';
