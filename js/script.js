@@ -76,12 +76,25 @@ function calculate() {
         const variables = [...new Set(simplifiedExpr.match(/\b\w+\b/g))];
 
         // Evaluar la expresión en el contexto de las variables definidas
-        let result = new Function(...variables, "return " + simplifiedExpr).call(null, ...variables.map(v => undefined)); // Sin valores asignados
-
+        let result = new Function(...variables, `return (${simplifiedExpr});`)(...variables.map(v => undefined)); // Sin valores asignados
+        
         // Manejar el resultado
-        const output = result === undefined ? 'Error' : result ? 'Verdadero' : 'Falso';
-        document.getElementById("booleanResult").textContent = output;
-        steps.push(`Evaluación: ${output}`);
+        if (result === undefined) {
+            // Verifica si es una variable sin valor asignado
+            const undefinedVars = variables.filter(v => typeof window[v] === 'undefined');
+            if (undefinedVars.length > 0) {
+                result = undefinedVars.join(", "); // Muestra las variables no definidas
+            } else {
+                result = 'Error'; // Error general
+            }
+        } else if (typeof result === 'boolean') {
+            result = result ? 'Verdadero' : 'Falso';
+        } else if (result === 0 || result === 1) {
+            result = result.toString(); // Convertir 0 o 1 a cadena
+        }
+
+        document.getElementById("booleanResult").textContent = result;
+        steps.push(`Evaluación: ${result}`);
     } catch (error) {
         document.getElementById("booleanResult").textContent = 'Error en la expresión';
         steps.push(`Error al evaluar la expresión`);
