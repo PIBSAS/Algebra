@@ -60,24 +60,28 @@ function calculate() {
     // Reemplazar operadores por sus equivalentes en JavaScript
     let booleanExpr = expression
         .replace(/\bAND\b/g, '&&')
+        .replace(/\band\b/g, '&&')
         .replace(/\bOR\b/g, '||')
-        .replace(/\bNOT\b/g, '!');
+        .replace(/\bor\b/g, '||')
+        .replace(/\bNOT\b/g, '!')
+        .replace(/\bnot\b/g, '!');
     
     // Paso 2: Simplificar la expresión usando los postulados del Álgebra de Boole
     let simplifiedExpr = simplifyExpression(booleanExpr);
     steps.push(`Expresión simplificada: ${simplifiedExpr}`);
     
-    // Definir variables a partir de la expresión
-    const variables = [...new Set(simplifiedExpr.match(/\b\w+\b/g))].reduce((acc, variable) => {
-        acc[variable] = true; // Puedes cambiarlo a false según necesites
-        return acc;
-    }, {});
     // Paso 3: Evaluar la expresión simplificada
     try {
+        // Definir las variables encontradas
+        const variables = [...new Set(simplifiedExpr.match(/\b\w+\b/g))];
+
         // Evaluar la expresión en el contexto de las variables definidas
-        let result = new Function("with(this) { return " + simplifiedExpr + "; }").call(variables);
-        document.getElementById("booleanResult").textContent = result ? 'Verdadero' : 'Falso';
-        steps.push(`Evaluación: ${result ? 'Verdadero' : 'Falso'}`);
+        let result = new Function(...variables, "return " + simplifiedExpr).call(null, ...variables.map(v => undefined)); // Sin valores asignados
+
+        // Manejar el resultado
+        const output = result === undefined ? 'Error' : result ? 'Verdadero' : 'Falso';
+        document.getElementById("booleanResult").textContent = output;
+        steps.push(`Evaluación: ${output}`);
     } catch (error) {
         document.getElementById("booleanResult").textContent = 'Error en la expresión';
         steps.push(`Error al evaluar la expresión`);
