@@ -61,13 +61,11 @@ function calculate() {
     let booleanExpr = expression
         .replace(/\bAND\b/g, '&&')
         .replace(/\band\b/g, '&&')
-        .replace(/\b.\b/g, '&&')
-        .replace(/\b*\b/g, '&&')
         .replace(/\bOR\b/g, '||')
         .replace(/\bor\b/g, '||')
-        .replace(/\b+\b/g, '&&')
         .replace(/\bNOT\b/g, '!')
-        .replace(/\bnot\b/g, '!');
+        .replace(/\bnot\b/g, '!')
+        .replace(/\s+\g, ' ');
     
     // Paso 2: Simplificar la expresión usando los postulados del Álgebra de Boole
     let simplifiedExpr = simplifyExpression(booleanExpr);
@@ -79,30 +77,19 @@ function calculate() {
         const variables = [...new Set(simplifiedExpr.match(/\b\w+\b/g))];
 
         // Evaluar la expresión en el contexto de las variables definidas
-        let result = new Function(...variables, `return (${simplifiedExpr.replace(/\b0\b/g, 'false').replace(/\b1\b/g, 'true')});`)(...variables.map(() => undefined)); // Sin valores asignados
-
-        // Verificar si la expresión contiene solo '0', '1', y variables válidas
-        if (variables.length === 0 && /^(0|1)$/.test(simplifiedExpr)) {
-            // Si solo hay 0 o 1
-            document.getElementById("booleanResult").textContent = simplifiedExpr;
-            steps.push(`Evaluación: ${simplifiedExpr}`);
+        let result = new Function(...variables, `return (${simplifiedExpr.replace(/\b0\b/g, 'false').replace(/\b1\b/g, 'true')});`)(...variables.map(() => undefined)); // Sin valores asignados    
+        // Manejar el resultado
+        if (result === undefined) {
+            // No se puede evaluar si hay variables sin valor
+            result = variables.length === 0 ? 'Error en la expresión' : '0'; // Mostrar variables no definidas
+        } else if (result === true || result === false) {
+            result = result ? '1' : '0'; // Para booleanos
         } else {
-            // Evaluar la expresión sin asignar valores por defecto
-            let result = new Function(...variables, `return (${simplifiedExpr.replace(/\b0\b/g, 'false').replace(/\b1\b/g, 'true')});`)(...variables.map(() => undefined));
-            
-            // Manejar el resultado
-            if (result === undefined) {
-                // No se puede evaluar si hay variables sin valor
-                result = variables.join(", "); // Mostrar variables no definidas
-            } else if (result === true || result === false) {
-                result = result ? '1' : '0'; // Para booleanos
-            } else {
-                result = result.toString(); // Convertir a cadena
-            }
-    
-            document.getElementById("booleanResult").textContent = result;
-            steps.push(`Evaluación: ${result}`);
+            result = result.toString(); // Convertir a cadena
         }
+
+        document.getElementById("booleanResult").textContent = result;
+        steps.push(`Evaluación: ${result}`);
     } catch (error) {
         document.getElementById("booleanResult").textContent = 'Error en la expresión';
         steps.push(`Error al evaluar la expresión`);
